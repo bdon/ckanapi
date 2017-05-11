@@ -30,12 +30,11 @@ class RemoteCKAN(object):
     :param user_agent: the User-agent to report when making requests
     :param get_only: only use GET requests (default: False)
     """
-    def __init__(self, address, apikey=None, user_agent=None, get_only=False, use_sessions=False):
+    def __init__(self, address, apikey=None, user_agent=None, get_only=False):
         self.address = address
         self.apikey = apikey
         self.get_only = get_only
         self.session = None
-        self.use_sessions = use_sessions
         if not user_agent:
             user_agent = "ckanapi/{version} (+{url})".format(
                 version=__version__,
@@ -78,11 +77,8 @@ class RemoteCKAN(object):
         headers['User-Agent'] = self.user_agent
         url = self.address.rstrip('/') + '/' + url
         requests_kwargs = requests_kwargs or {}
-        if not self.use_sessions:
-            self.session = requests
-        else:
-            if not self.session:
-                self.session = requests.Session()
+        if not self.session:
+            self.session = requests.Session()
         if self.get_only:
             status, response = self._request_fn_get(url, data_dict, headers, requests_kwargs)
         else:
@@ -106,7 +102,7 @@ class RemoteCKAN(object):
 
     def close(self):
         """Close session"""
-        if self.use_sessions and self.session:
+        if self.session:
             self.session.close()
             self.session = None
 
