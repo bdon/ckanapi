@@ -17,7 +17,7 @@ MY_SITES = ['localhost', '127.0.0.1', '[::1]']
 PARALLEL_LIMIT = 3
 
 import requests
-
+from requests.adapters import HTTPAdapter
 
 class RemoteCKAN(object):
     """
@@ -79,6 +79,8 @@ class RemoteCKAN(object):
         requests_kwargs = requests_kwargs or {}
         if not self.session:
             self.session = requests.Session()
+            self.session.mount('http', HTTPAdapter(max_retries=3))
+            self.session.mount('https', HTTPAdapter(max_retries=3))
         if self.get_only:
             status, response = self._request_fn_get(url, data_dict, headers, requests_kwargs)
         else:
